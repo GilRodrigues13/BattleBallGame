@@ -75,8 +75,8 @@ export const ProductsArea = styled.div`
   }
 
   > div {
-    height: 300px;
-    width: 170px;
+    height: 400px;
+    width: 230px;
     border: 5px solid rgb(194, 193, 193);
     border-image: linear-gradient(#034b19, #09ba85) 1;
     cursor: pointer;

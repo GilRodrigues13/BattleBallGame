@@ -1,20 +1,26 @@
-// Home.js
 import React, { useState } from 'react';
 import { AiFillPlusCircle, AiFillMinusCircle } from 'react-icons/ai';
 import { Container, ProductsArea, BodyStyle } from './HomeStyles';
 
 const Home = () => {
-  const [products, setProducts] = useState([]);
+  const [player1Products, setPlayer1Products] = useState([]);
+  const [player2Products, setPlayer2Products] = useState([]);
   const [cart, setCart] = useState([]);
   const [showCreateProduct, setShowCreateProduct] = useState(false);
+  const [activePlayer, setActivePlayer] = useState(1); // Inicialize com o jogador 1
 
   const handleCreateProduct = (newProduct) => {
     const img = new Image();
     img.src = newProduct.thumbnail;
     img.onload = function () {
       newProduct.thumbnail = img.src;
-      setProducts([...products, newProduct]);
-      setShowCreateProduct(false); // Feche o formulário após a criação
+
+      if (activePlayer === 1) {
+        setPlayer1Products([...player1Products, newProduct]);
+      } else if (activePlayer === 2) {
+        setPlayer2Products([...player2Products, newProduct]);
+      }
+      setShowCreateProduct(false);
     };
   };
 
@@ -28,6 +34,10 @@ const Home = () => {
     }
   };
 
+  const toggleActivePlayer = () => {
+    setActivePlayer(activePlayer === 1 ? 2 : 1); // Alternar entre os jogadores 1 e 2
+  };
+
   return (
     <BodyStyle>
       <Container>
@@ -35,8 +45,8 @@ const Home = () => {
         <button onClick={() => setShowCreateProduct(!showCreateProduct)}>
           {showCreateProduct ? 'Ocultar Formulário' : 'Criar Carta'}
         </button>
+        <button onClick={toggleActivePlayer}>Trocar de jogador</button>
 
-        {/* Renderizar o formulário de criação de produtos condicionalmente */}
         {showCreateProduct && (
           <div>
             <h2>Criar Carta</h2>
@@ -46,51 +56,92 @@ const Home = () => {
                 const newProduct = {
                   id: Date.now(),
                   thumbnail: e.target.thumbnail.value,
+                  attack: '',
+                  defense: '',
                 };
-
                 handleCreateProduct(newProduct);
               }}
             >
               <div>
-                <label htmlFor="thumbnail">URL da Imagem :</label>
+                <label htmlFor="thumbnail">URL da Imagem (100px x 100px):</label>
                 <input type="url" id="thumbnail" name="thumbnail" required />
               </div>
               <button type="submit">Criar Carta</button>
-              
             </form>
           </div>
         )}
 
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
-          <ProductsArea className="first-ten-cards">
-            {products.slice(0, 10).map((product, index) => (
-              <div key={product.id} className="product">
-              <input style={{ width: 90 }} placeholder='Ataque' />
-                <input style={{ width: 90 }} placeholder='Vida' />
+        <div className="product-container" style={{ display: 'flex', flexWrap: 'wrap' }}>
+          {activePlayer === 1 && (
+            player1Products.map((product) => (
+              <div key={product.id} className="product" style={{ margin: '10px', textAlign: 'center' }}>
                 <img
                   src={product.thumbnail}
-                  alt="Product Image"
-                  style={{ width: '170px', height: '300px' }}
+                  alt="Imagem do Produto"
+                  style={{ width: '250px', height: '320px' }}
                 />
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  <span>Ataque:</span>
+                  <input
+                    type="number"
+                    value={product.attack}
+                    onChange={(e) => {
+                      const updatedProduct = { ...product, attack: e.target.value };
+                      const updatedProducts = player1Products.map((p) => (p.id === product.id ? updatedProduct : p));
+                      setPlayer1Products(updatedProducts);
+                    }}
+                    style={{ width: '150px' }}
+                  />
+                  <span>Defesa:</span>
+                  <input
+                    type="number"
+                    value={product.defense}
+                    onChange={(e) => {
+                      const updatedProduct = { ...product, defense: e.target.value };
+                      const updatedProducts = player1Products.map((p) => (p.id === product.id ? updatedProduct : p));
+                      setPlayer1Products(updatedProducts);
+                    }}
+                    style={{ width: '150px' }}
+                  />
+                </div>
               </div>
-            ))}
-          </ProductsArea>
-        </div>
-
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
-          <ProductsArea className="additional-cards">
-            {products.slice(10).map((product, index) => (
-              <div key={product.id} className="product">
-              <input style={{ width: 100 }} placeholder='Ataque' />
-                <input style={{ width: 100 }} placeholder='Defesa' />
+            ))
+          )}
+          {activePlayer === 2 && (
+            player2Products.map((product) => (
+              <div key={product.id} className="product" style={{ margin: '10px', textAlign: 'center' }}>
                 <img
                   src={product.thumbnail}
-                  alt="Product Image"
-                  style={{ width: '230px', height: '320px' }}
+                  alt="Imagem do Produto"
+                  style={{ width: '250px', height: '320px' }}
                 />
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  <span>Ataque:</span>
+                  <input
+                    type="number"
+                    value={product.attack}
+                    onChange={(e) => {
+                      const updatedProduct = { ...product, attack: e.target.value };
+                      const updatedProducts = player2Products.map((p) => (p.id === product.id ? updatedProduct : p));
+                      setPlayer2Products(updatedProducts);
+                    }}
+                    style={{ width: '150px' }}
+                  />
+                  <span>Defesa:</span>
+                  <input
+                    type="number"
+                    value={product.defense}
+                    onChange={(e) => {
+                      const updatedProduct = { ...product, defense: e.target.value };
+                      const updatedProducts = player2Products.map((p) => (p.id === product.id ? updatedProduct : p));
+                      setPlayer2Products(updatedProducts);
+                    }}
+                    style={{ width: '150px' }}
+                  />
+                </div>
               </div>
-            ))}
-          </ProductsArea>
+            ))
+          )}
         </div>
       </Container>
     </BodyStyle>
